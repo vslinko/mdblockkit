@@ -521,6 +521,25 @@
           "indent": 0
         }
       ]
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "link",
+              "url": "https://example.com/",
+              "text": "Example Link"
+            },
+            {
+              "type": "text",
+              "text": "\n\n"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

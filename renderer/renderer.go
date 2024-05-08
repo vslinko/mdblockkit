@@ -235,6 +235,8 @@ func (r MyRenderer) RenderRichTextSectionElement(w io.Writer, source []byte, nod
 		return r.RenderText(w, source, node)
 	case ast.KindEmphasis:
 		return r.RenderEmphasis(w, source, node)
+	case ast.KindLink:
+		return r.RenderLink(w, source, node)
 	default:
 		return nil, errors.New("unsupported node type: " + node.Kind().String())
 	}
@@ -259,6 +261,27 @@ func (r MyRenderer) RenderEmphasis(w io.Writer, source []byte, node ast.Node) ([
 
 	return []slack.RichTextSectionElement{
 		slack.NewRichTextSectionTextElement(text, &style),
+	}, nil
+}
+
+func (r MyRenderer) RenderLink(w io.Writer, source []byte, node ast.Node) ([]slack.RichTextSectionElement, error) {
+	if err := r.AssertKind(node, ast.KindLink); err != nil {
+		return nil, err
+	}
+
+	linkNode := node.(*ast.Link)
+
+	var style *slack.RichTextSectionTextStyle
+	if r.insideHeader {
+		style = &slack.RichTextSectionTextStyle{
+			Bold: true,
+		}
+	}
+
+	text := string(node.Text(source))
+
+	return []slack.RichTextSectionElement{
+		slack.NewRichTextSectionLinkElement(string(linkNode.Destination), text, style),
 	}, nil
 }
 
