@@ -14,6 +14,8 @@ type MyRenderer struct {
 	insideHeader    bool
 	blockquoteLevel int
 	listLevel       int
+	bold            bool
+	italic          bool
 }
 
 func CreateMyRenderer(blocks *slack.Blocks) *MyRenderer {
@@ -22,6 +24,8 @@ func CreateMyRenderer(blocks *slack.Blocks) *MyRenderer {
 		insideHeader:    false,
 		blockquoteLevel: 0,
 		listLevel:       0,
+		bold:            false,
+		italic:          false,
 	}
 }
 
@@ -248,20 +252,26 @@ func (r MyRenderer) RenderEmphasis(w io.Writer, source []byte, node ast.Node) ([
 	}
 
 	emphasisNode := node.(*ast.Emphasis)
-	style := slack.RichTextSectionTextStyle{}
+
+	prevBold := r.bold
+	prevItalic := r.italic
 
 	if r.insideHeader || emphasisNode.Level == 2 {
-		style.Bold = true
+		r.bold = true
 	}
 	if emphasisNode.Level == 1 {
-		style.Italic = true
+		r.italic = true
 	}
 
-	text := string(node.Text(source))
+	elements, err := r.RenderRichTextSectionElements(w, source, node)
+	if err != nil {
+		return nil, err
+	}
 
-	return []slack.RichTextSectionElement{
-		slack.NewRichTextSectionTextElement(text, &style),
-	}, nil
+	r.bold = prevBold
+	r.italic = prevItalic
+
+	return elements, nil
 }
 
 func (r MyRenderer) RenderLink(w io.Writer, source []byte, node ast.Node) ([]slack.RichTextSectionElement, error) {
@@ -293,10 +303,14 @@ func (r MyRenderer) RenderText(w io.Writer, source []byte, node ast.Node) ([]sla
 	textNode := node.(*ast.Text)
 
 	var style *slack.RichTextSectionTextStyle
-	if r.insideHeader {
-		style = &slack.RichTextSectionTextStyle{
-			Bold: true,
-		}
+	if r.insideHeader || r.bold || r.italic {
+		style = &slack.RichTextSectionTextStyle{}
+	}
+	if r.insideHeader || r.bold {
+		style.Bold = true
+	}
+	if r.italic {
+		style.Italic = true
 	}
 
 	text := string(node.Text(source))

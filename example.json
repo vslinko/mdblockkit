@@ -210,6 +210,7 @@
               "type": "text",
               "text": "really important",
               "style": {
+                "bold": true,
                 "italic": true
               }
             },
@@ -225,6 +226,7 @@
               "type": "text",
               "text": "really important",
               "style": {
+                "bold": true,
                 "italic": true
               }
             },
@@ -240,7 +242,8 @@
               "type": "text",
               "text": "really important",
               "style": {
-                "bold": true
+                "bold": true,
+                "italic": true
               }
             },
             {
@@ -255,7 +258,8 @@
               "type": "text",
               "text": "really important",
               "style": {
-                "bold": true
+                "bold": true,
+                "italic": true
               }
             },
             {
@@ -270,6 +274,7 @@
               "type": "text",
               "text": "very",
               "style": {
+                "bold": true,
                 "italic": true
               }
             },
